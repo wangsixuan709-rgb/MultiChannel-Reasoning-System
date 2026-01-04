@@ -205,3 +205,28 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+
+# ===========================
+# 自定义 AI 项目过滤规则 (Added by Tenerife-Q)
+# ===========================
+
+# 1. 忽略大模型权重文件 (防止上传失败)
+*.pth
+*.pt
+*.bin
+*.onnx
+*.h5
+*.weights
+
+# 2. 忽略数据集的具体图片 (如果图片太大或不想上传)
+# 如果这50-200张图不大，可以不加下面这行，保留在仓库里方便队友看
+# data/images/*.jpg
+# data/images/*.png
+
+# 3. 忽略系统生成文件
+.DS_Store
+Thumbs.db
+
+# 4. 忽略本地环境配置
+.env
