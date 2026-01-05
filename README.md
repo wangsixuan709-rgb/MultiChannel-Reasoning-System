@@ -1,25 +1,32 @@
-
 # MultiChannel-Reasoning-System
 
 ## Project Goals and Introduction
-
 This project aims to develop a multi-modal fake news detection system specifically designed for patent application scenarios. The system integrates three distinct reasoning channels—Physical, Semantic, and Logical—to analyze multimedia content comprehensively.
 
 The core objective is to process input data (images and text) through these independent channels and aggregate the results to assess credibility and detect potential forgeries or inconsistencies.
 
-## Directory Structure
+### System Architecture
+The system is designed with a future-proof architecture incorporating a Blockchain Trust Layer for immutable evidence recording.
 
+![System Architecture](./dataset/architecture.png)
+
+### Inference Workflow
+The multi-channel inference engine orchestrates the interaction between the Physical, Semantic, and Logical layers to produce a final verdict.
+
+![Inference Process](./dataset/process.png)
+
+## Directory Structure
 ```text
 MultiChannel-Reasoning-System/
 │
-├── .gitignore                  # [配置] 忽略规则 (已配置好)
-├── README.md                   # [文档] 项目说明书
-├── requirements.txt            # [依赖] pip install -r requirement
+├── .gitignore                   # [配置] 忽略规则 (已配置好)
+├── README.md                    # [文档] 项目说明书
+├── requirements.txt             # [依赖] pip install -r requirements.txt
 │
 ├── main_demo.py                 # [入口] 总指挥脚本 (串联三个通道)
 │
-├── data/                       # [数据中心]
-│   ├── images/                 # [图片仓] 所有的 .jpg / .png 都放这里
+├── data/                        # [数据中心]
+│   ├── images/                  # [图片仓] 所有的 .jpg / .png 都放这里
 │   │   ├── ps_splicing_001.jpg
 │   │   ├── aigc_eraser_001.jpg
 │   │   └── ... (50-200张)
@@ -41,48 +48,39 @@ MultiChannel-Reasoning-System/
 
 ```
 
----
-
-## 各模块开发任务指南
+## 各模块开发任务指南 (Module Guidelines)
 
 以下是各模块的简要代码分析与任务说明。关于具体的算法实现细节、参数设置及理论依据，请务必查阅各模块目录下的 **PDF 指南手册 (Guide Book)**。
 
-### 1. 总控模块 (Root)
+![Three Channels Details](./dataset/three%20channels.png)
 
+### 1. 总控模块 (Root)
 * **脚本**: `main_demo.py`
 * **任务**: 负责系统的整体调度。需要读取 `data/` 下的 Excel 数据表，循环处理每一个样本，依次调用三个通道的检测接口，最后加权汇总得出最终判定结果。
 
 ### 2. 数据中心 (Data Center)
-
 * **目录**: `data/`
 * **任务**:
-* **图像存储**: 将所有测试图片集中存放于 `images/` 目录。
-* **数据标准化**: 运行 `create_excel_v2.py` 生成标准化的 Excel 文件 (`Yuanjing_Data_Standard_v2.xlsx`)，确保每一行数据准确对应图片路径和文本描述。
-
-
+    * **图像存储**: 将所有测试图片集中存放于 `images/` 目录。
+    * **数据标准化**: 运行 `create_excel_v2.py` 生成标准化的 Excel 文件 (`Yuanjing_Data_Standard_v2.xlsx`)，确保每一行数据准确对应图片路径和文本描述。
 
 ### 3. 通道一：物理层伪造检测 (Channel 1)
-
 * **目录**: `channel_1_forgery_detection/`
 * **核心代码**: `detector.py`
-* **任务简述**: 负责图像层面的硬核防伪。需要编写代码加载 `weights/` 下的预训练模型，对输入图像进行信号分析（如噪声指纹、频谱异常）。
-* **输入输出**: 输入图片路径，输出伪造置信度。
+* **任务简述**: 负责图像层面的硬核防伪。需要编写代码加载 `weights/` 下的预训练模型 (Focus on **MVSS-Net**)，对输入图像进行信号分析（如噪声指纹、频谱异常）。
+* **输入输出**: 输入图片路径 -> 输出 **篡改概率/Mask图**。
 * **注意**: 详细的模型架构与训练细节请参阅该目录下的 **PDF 文档**。
 
 ### 4. 通道二：语义一致性检测 (Channel 2)
-
 * **目录**: `channel_2_consistency_clip/`
 * **核心代码**: `matcher.py`
-* **任务简述**: 负责检测“图文不符”。利用 CLIP 模型提取图像和文本的特征向量，计算余弦相似度。
-* **输入输出**: 输入图片与对应文本，输出一致性得分。
+* **任务简述**: 负责检测“图文不符”。利用 **CLIP ViT** 模型提取图像和文本的特征向量，计算余弦相似度。
+* **输入输出**: 输入图片与对应文本 -> 输出 **一致性得分 (0-1)**。
 * **注意**: CLIP 模型的具体调用方式与阈值设定请参阅该目录下的 **PDF 文档**。
 
 ### 5. 通道三：逻辑规则推理 (Channel 3)
-
 * **目录**: `channel_3_logic_rules/`
 * **核心代码**: `reasoner.py`
-* **任务简述**: 负责文本层面的逻辑自洽性检查。基于 `knowledge_base.json` 中的知识或预设逻辑规则，检测新闻要素是否存在冲突。
-* **输入输出**: 输入文本信息，输出逻辑可信度。
+* **任务简述**: 负责文本层面的逻辑自洽性检查。基于 `knowledge_base.json` 中的知识或 **VLM-CoT (思维链)**，检测新闻要素是否存在冲突。
+* **输入输出**: 输入文本信息 -> 输出 **逻辑冲突类型**。
 * **注意**: 具体的逻辑规则定义与推理树结构请参阅该目录下的 **PDF 文档**。
-
----
