@@ -31,7 +31,7 @@ MultiChannel-Reasoning-System/
 │   │   ├── aigc_eraser_001.jpg
 │   │   └── ... (50-200张)
 │   ├── Yuanjing_Data_Standard_v2.xlsx  # [核心] 最终版数据表 (由 create_excel_v2.py 生成)
-│   └── create_excel_v2.py       # [工具] 生成Excel的脚本 (保留 v2，删掉 v1)
+│   └── create_excel_final.py       # [工具] 生成Excel的脚本 (保留 v1, v2在/dataset 最终样本final)
 │
 ├── channel_1_forgery_detection/ # [通道一] 物理层
 │   ├── detector.py              # [核心] 篡改检测代码
